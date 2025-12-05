@@ -1,45 +1,74 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
-# Set styling for professional appearance
+# Set professional styling
 sns.set_style("whitegrid")
-sns.set_context("talk")
+sns.set_context("notebook", font_scale=1.2)
 
 # Generate realistic synthetic data for customer satisfaction by product category
-np.random.seed(42)
-categories = [
-    "Electronics", "Home & Kitchen", "Apparel", "Beauty & Personal Care",
-    "Books", "Toys & Games", "Sports & Outdoors", "Grocery"
-]
-satisfaction_scores = np.random.normal(loc=4.0, scale=0.5, size=len(categories))
-satisfaction_scores = np.clip(satisfaction_scores, 1.0, 5.0)  # Ensure scores between 1-5
+data = {
+    'Product Category': [
+        'Electronics',
+        'Clothing',
+        'Home & Garden',
+        'Sports & Outdoors',
+        'Books & Media',
+        'Beauty & Health',
+        'Toys & Games',
+        'Food & Beverages'
+    ],
+    'Average Satisfaction': [
+        4.2,
+        4.5,
+        4.1,
+        4.3,
+        4.6,
+        4.4,
+        4.0,
+        4.7
+    ]
+}
 
-data = pd.DataFrame({
-    "Product Category": categories,
-    "Avg Customer Satisfaction": satisfaction_scores
-})
+# Create DataFrame
+df = pd.DataFrame(data)
 
-# Sort by satisfaction score for better visual interpretation
-data = data.sort_values("Avg Customer Satisfaction", ascending=False)
+# Sort by satisfaction score for better visualization
+df = df.sort_values('Average Satisfaction', ascending=False)
 
-# Create the figure
+# Create figure with specified size for 512x512 output
 plt.figure(figsize=(8, 8))
 
-# Create barplot
-barplot = sns.barplot(
-    data=data,
-    x="Avg Customer Satisfaction",
-    y="Product Category",
-    palette="viridis"
+# Create barplot with professional color palette
+sns.barplot(
+    data=df,
+    x='Average Satisfaction',
+    y='Product Category',
+    palette='Blues_d',
+    edgecolor='black',
+    linewidth=1.2
 )
 
-# Customize labels and title
-plt.title("Average Customer Satisfaction by Product Category\n(Retail Client Analysis)", fontsize=16, pad=20)
-plt.xlabel("Average Satisfaction Score (1–5 Scale)", fontsize=12)
-plt.ylabel("Product Category", fontsize=12)
+# Add professional titles and labels
+plt.title('Customer Satisfaction by Product Category\nAverage Rating Score (1-5 Scale)',
+          fontsize=16, fontweight='bold', pad=20)
+plt.xlabel('Average Satisfaction Score', fontsize=13, fontweight='bold')
+plt.ylabel('Product Category', fontsize=13, fontweight='bold')
 
-# Adjust layout and save
+# Add value labels on bars
+for i, v in enumerate(df['Average Satisfaction']):
+    plt.text(v + 0.05, i, f'{v:.1f}', 
+             va='center', fontsize=11, fontweight='bold')
+
+# Set x-axis limits for better presentation
+plt.xlim(0, 5)
+
+# Adjust layout for clean appearance
 plt.tight_layout()
-plt.savefig('chart.png', dpi=64, bbox_inches='tight')  # 8*64 = 512 pixels
+
+# Save chart with exact specifications
+plt.savefig('chart.png', dpi=64, bbox_inches='tight')
+print("Chart saved successfully as chart.png (512x512 pixels)")
+
+# Display the chart
+plt.show()
