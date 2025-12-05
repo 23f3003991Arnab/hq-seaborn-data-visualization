@@ -4,7 +4,7 @@ import pandas as pd
 
 # Set professional styling
 sns.set_style("whitegrid")
-sns.set_context("notebook", font_scale=1.2)
+sns.set_context("notebook", font_scale=1.1)
 
 # Generate realistic synthetic data for customer satisfaction by product category
 data = {
@@ -36,8 +36,8 @@ df = pd.DataFrame(data)
 # Sort by satisfaction score for better visualization
 df = df.sort_values('Average Satisfaction', ascending=False)
 
-# Create figure with specified size for 512x512 output
-plt.figure(figsize=(8, 8))
+# Create figure with exact size for 512x512 output (IMPORTANT: Remove bbox_inches='tight')
+fig, ax = plt.subplots(figsize=(512/64, 512/64), dpi=64)
 
 # Create barplot with professional color palette
 sns.barplot(
@@ -46,28 +46,29 @@ sns.barplot(
     y='Product Category',
     palette='Blues_d',
     edgecolor='black',
-    linewidth=1.2
+    linewidth=1.2,
+    ax=ax
 )
 
 # Add professional titles and labels
-plt.title('Customer Satisfaction by Product Category\nAverage Rating Score (1-5 Scale)',
-          fontsize=16, fontweight='bold', pad=20)
-plt.xlabel('Average Satisfaction Score', fontsize=13, fontweight='bold')
-plt.ylabel('Product Category', fontsize=13, fontweight='bold')
+ax.set_title('Customer Satisfaction by Product Category\nAverage Rating Score (1-5 Scale)',
+             fontsize=14, fontweight='bold', pad=15)
+ax.set_xlabel('Average Satisfaction Score', fontsize=11, fontweight='bold')
+ax.set_ylabel('Product Category', fontsize=11, fontweight='bold')
 
 # Add value labels on bars
 for i, v in enumerate(df['Average Satisfaction']):
-    plt.text(v + 0.05, i, f'{v:.1f}', 
-             va='center', fontsize=11, fontweight='bold')
+    ax.text(v + 0.05, i, f'{v:.1f}', 
+            va='center', fontsize=10, fontweight='bold')
 
 # Set x-axis limits for better presentation
-plt.xlim(0, 5)
+ax.set_xlim(0, 5)
 
-# Adjust layout for clean appearance
-plt.tight_layout()
+# Adjust layout to fit within exact dimensions
+plt.subplots_adjust(left=0.25, right=0.95, top=0.92, bottom=0.08)
 
-# Save chart with exact specifications
-plt.savefig('chart.png', dpi=64, bbox_inches='tight')
+# Save chart with exact specifications (NO bbox_inches='tight')
+plt.savefig('chart.png', dpi=64)
 print("Chart saved successfully as chart.png (512x512 pixels)")
 
 # Display the chart
