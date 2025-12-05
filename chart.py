@@ -1,59 +1,95 @@
+
+---
+
+### `chart.py` contents:
+```python
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from PIL import Image
-import io
 
-np.random.seed(42)
-
-# -----------------------------
-# Synthetic Data
-# -----------------------------
-segments = ['Budget', 'Regular', 'Premium', 'VIP']
-data = []
-
-for segment in segments:
-    if segment == 'Budget':
-        amounts = np.random.normal(50, 15, 150)
-    elif segment == 'Regular':
-        amounts = np.random.normal(150, 30, 200)
-    elif segment == 'Premium':
-        amounts = np.random.normal(300, 50, 120)
-    else:  # VIP
-        amounts = np.random.normal(500, 100, 80)
-    amounts = np.clip(amounts, 0, None)
-    data.extend([[segment, amt] for amt in amounts])
-
-df = pd.DataFrame(data, columns=['Customer Segment', 'Purchase Amount'])
-
-# -----------------------------
-# Seaborn Style
-# -----------------------------
+# Set professional styling
 sns.set_style("whitegrid")
-sns.set_context("talk")
+sns.set_context("talk")  # Larger text for presentations
 
-# -----------------------------
-# Create a larger figure for layout
-# -----------------------------
-fig, ax = plt.subplots(figsize=(8, 8))  # layout space
-sns.boxplot(x='Customer Segment', y='Purchase Amount', data=df, palette='Set2', ax=ax)
+# Generate realistic synthetic data for retail product categories
+np.random.seed(42)  # For reproducibility
+categories = ['Electronics', 'Clothing & Apparel', 'Home & Kitchen', 
+              'Beauty & Personal Care', 'Sports & Outdoors', 'Books & Media']
 
-ax.set_title("Purchase Amount Distribution by Customer Segment", fontsize=16, weight='bold')
-ax.set_xlabel("Customer Segment", fontsize=12)
-ax.set_ylabel("Purchase Amount ($)", fontsize=12)
+# Create realistic satisfaction scores (scale 1-10)
+data = []
+for category in categories:
+    # Different base scores per category with realistic variations
+    if category == 'Electronics':
+        base_score = 8.7
+        variation = 0.8
+    elif category == 'Clothing & Apparel':
+        base_score = 7.9
+        variation = 1.2
+    elif category == 'Home & Kitchen':
+        base_score = 8.2
+        variation = 0.7
+    elif category == 'Beauty & Personal Care':
+        base_score = 8.9
+        variation = 0.6
+    elif category == 'Sports & Outdoors':
+        base_score = 8.5
+        variation = 1.0
+    else:  # Books & Media
+        base_score = 8.4
+        variation = 0.9
+    
+    # Generate 100 samples per category
+    scores = np.random.normal(base_score, variation, 100)
+    scores = np.clip(scores, 1, 10)  # Ensure within 1-10 scale
+    
+    for score in scores:
+        data.append({'Product Category': category, 'Satisfaction Score': score})
 
-plt.tight_layout()  # prevent clipping
+df = pd.DataFrame(data)
 
-# -----------------------------
-# Render to PIL image at 512x512 pixels
-# -----------------------------
-buf = io.BytesIO()
-fig.savefig(buf, format='png', dpi=200)  # high dpi to preserve layout
-buf.seek(0)
-img = Image.open(buf)
-img = img.resize((512, 512), Image.LANCZOS)
-img.save('chart.png')
+# Create the visualization
+plt.figure(figsize=(8, 8))
 
-plt.close(fig)
-print("Chart saved as chart.png (exactly 512x512 pixels, text fully visible)")
+# Create barplot with professional color palette
+barplot = sns.barplot(
+    data=df,
+    x='Product Category',
+    y='Satisfaction Score',
+    palette='Blues_d',
+    errorbar='ci',  # Confidence intervals
+    capsize=0.1,
+    width=0.7
+)
+
+# Customize appearance
+plt.title('Customer Satisfaction by Product Category\nDouglas Buckridge Retail Analysis', 
+          fontsize=16, fontweight='bold', pad=20)
+plt.xlabel('Product Category', fontsize=14, fontweight='semibold')
+plt.ylabel('Average Satisfaction Score (1-10)', fontsize=14, fontweight='semibold')
+
+# Rotate x-axis labels for better readability
+plt.xticks(rotation=15, ha='right')
+
+# Add value labels on top of bars
+for i, bar in enumerate(barplot.patches):
+    barplot.text(
+        bar.get_x() + bar.get_width() / 2,
+        bar.get_height() + 0.05,
+        f'{bar.get_height():.1f}',
+        ha='center',
+        va='bottom',
+        fontsize=11,
+        fontweight='bold'
+    )
+
+# Set y-axis limits for better visual appeal
+plt.ylim(6, 10)
+
+# Adjust layout and save
+plt.tight_layout()
+plt.savefig('chart.png', dpi=64, bbox_inches='tight')  # 8*64 = 512 pixels
+plt.show()
+
+print("Chart saved as 'chart.png' (512×512 pixels)")
